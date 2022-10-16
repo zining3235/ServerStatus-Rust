@@ -1,4 +1,4 @@
-FROM rust:1.60-alpine3.15 as builder
+FROM rust:1-alpine3.16 as builder
 # This is important, see https://github.com/rust-lang/docker-rust/issues/85
 ENV RUSTFLAGS="-C target-feature=-crt-static"
 ENV RUST_BACKTRACE=full
@@ -10,7 +10,7 @@ RUN apk add --no-cache musl-dev git cmake make g++
 RUN cargo build --release --bin stat_server
 RUN strip /app/target/release/stat_server
 
-FROM alpine:3.15 as production
+FROM alpine:3.16 as production
 LABEL version="1.0.0" \
     description="A simple server monitoring tool" \
     by="Doge" \

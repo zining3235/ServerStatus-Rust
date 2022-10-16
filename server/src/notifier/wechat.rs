@@ -39,21 +39,9 @@ impl WeChat {
             config: cfg,
             http_client: reqwest::Client::new(),
         };
-        add_template(
-            KIND,
-            get_tag(&Event::NodeUp),
-            o.config.online_tpl.to_string(),
-        );
-        add_template(
-            KIND,
-            get_tag(&Event::NodeDown),
-            o.config.offline_tpl.to_string(),
-        );
-        add_template(
-            KIND,
-            get_tag(&Event::Custom),
-            o.config.custom_tpl.to_string(),
-        );
+        add_template(KIND, get_tag(&Event::NodeUp), o.config.online_tpl.to_string());
+        add_template(KIND, get_tag(&Event::NodeDown), o.config.offline_tpl.to_string());
+        add_template(KIND, get_tag(&Event::Custom), o.config.custom_tpl.to_string());
 
         o
     }
@@ -132,7 +120,8 @@ impl crate::notifier::Notifier for WeChat {
         render_template(
             self.kind(),
             get_tag(e),
-            context!(host => stat, config => self.config),
+            context!(host => stat, config => self.config, ip_info => stat.ip_info, sys_info => stat.sys_info),
+            true,
         )
         .map(|content| match *e {
             Event::NodeUp | Event::NodeDown => self.send_notify(content).unwrap(),

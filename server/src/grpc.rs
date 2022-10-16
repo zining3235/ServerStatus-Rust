@@ -13,10 +13,7 @@ pub struct ServerStatusSrv {}
 
 #[tonic::async_trait]
 impl ServerStatus for ServerStatusSrv {
-    async fn report(
-        &self,
-        request: Request<StatRequest>,
-    ) -> Result<Response<server_status::Response>, Status> {
+    async fn report(&self, request: Request<StatRequest>) -> Result<Response<server_status::Response>, Status> {
         if let Some(mgr) = G_STATS_MGR.get() {
             match serde_json::to_value(request.get_ref()) {
                 Ok(v) => {
@@ -36,26 +33,33 @@ impl ServerStatus for ServerStatusSrv {
 }
 
 fn check_auth(req: Request<()>) -> Result<Request<()>, Status> {
+    let mut group_auth = false;
+    req.metadata().get("ssr-auth").map(|v| {
+        v.to_str().map(|s| {
+            group_auth = s.eq("group");
+        })
+    });
+
     match req.metadata().get("authorization") {
         Some(token) => {
-            let tuple = token
-                .to_str()
-                .unwrap_or("")
-                .split("@_@")
-                .collect::<Vec<_>>();
+            let tuple = token.to_str().unwrap_or("").split("@_@").collect::<Vec<_>>();
 
             if tuple.len() == 2 {
-                if let Some(mgr) = G_CONFIG.get() {
-                    if mgr.auth(tuple[0], tuple[1]) {
+                if let Some(cfg) = G_CONFIG.get() {
+                    if group_auth {
+                        if cfg.group_auth(tuple[0], tuple[1]) {
+                            return Ok(req);
+                        }
+                    } else if cfg.auth(tuple[0], tuple[1]) {
                         return Ok(req);
                     }
                 }
             }
 
-            Err(Status::unauthenticated("invalid user && pass"))
+            Err(Status::unauthenticated("invalid user/group && pass"))
         }
 
-        _ => Err(Status::unauthenticated("invalid user && pass")),
+        _ => Err(Status::unauthenticated("invalid user/group && pass")),
     }
 }
 

@@ -10,12 +10,14 @@ fn default_as_true() -> bool {
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct HostStat {
     pub name: String,
-    #[serde(default = "Default::default", skip_deserializing)]
+    #[serde(default = "Default::default")]
     pub alias: String,
-    #[serde(rename = "type", skip_deserializing)]
+    #[serde(rename = "type", default = "Default::default")]
     pub host_type: String,
-    #[serde(skip_deserializing)]
+    #[serde(default = "Default::default")]
     pub location: String,
+    #[serde(default = "default_as_true")]
+    pub notify: bool,
     #[serde(default = "bool::default")]
     pub vnstat: bool,
 
@@ -75,6 +77,12 @@ pub struct HostStat {
     #[serde(skip_serializing)]
     pub sys_info: Option<SysInfo>,
 
+    // group
+    #[serde(default = "Default::default")]
+    pub gid: String,
+    #[serde(default = "Default::default")]
+    pub weight: u64,
+
     // user data
     #[serde(skip_deserializing)]
     pub latest_ts: u64,
@@ -93,10 +101,7 @@ pub struct StatsResp {
 impl StatsResp {
     pub fn new() -> Self {
         Self {
-            updated: SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
+            updated: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(),
             servers: Vec::new(),
         }
     }

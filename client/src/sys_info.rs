@@ -5,15 +5,15 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use std::thread;
 use std::time::Duration;
-use sysinfo::{DiskExt, NetworkExt, ProcessorExt, RefreshKind, System, SystemExt};
+use sysinfo::{CpuExt, DiskExt, NetworkExt, RefreshKind, System, SystemExt};
 
+use crate::skip_iface;
 use crate::status;
 use crate::status::get_vnstat_traffic;
 use crate::Args;
 use stat_common::server_status::{StatRequest, SysInfo};
 
 const SAMPLE_PERIOD: u64 = 1000; //ms
-static IFACE_IGNORE_VEC: &[&str] = &["lo", "docker", "vnet", "veth", "vmbr", "kube", "br-"];
 
 lazy_static! {
     pub static ref G_EXPECT_FS: Vec<&'static str> = [
@@ -41,9 +41,9 @@ pub fn start_cpu_percent_collect_t() {
     let mut sys = System::new_all();
     sys.refresh_cpu();
     thread::spawn(move || loop {
-        let global_processor = sys.global_processor_info();
+        let global_cpu = sys.global_cpu_info();
         if let Ok(mut cpu_percent) = G_CPU_PERCENT.lock() {
-            *cpu_percent = global_processor.cpu_usage().round() as f64;
+            *cpu_percent = global_cpu.cpu_usage().round() as f64;
         }
 
         sys.refresh_cpu();
@@ -61,13 +61,15 @@ lazy_static! {
     pub static ref G_NET_SPEED: Arc<Mutex<NetSpeed>> = Arc::new(Default::default());
 }
 
-pub fn start_net_speed_collect_t() {
+pub fn start_net_speed_collect_t(args: &Args) {
     let mut sys = System::new_all();
     sys.refresh_all();
+    let args_1 = args.clone();
     thread::spawn(move || loop {
         let (mut net_rx, mut net_tx) = (0_u64, 0_u64);
         for (name, data) in sys.networks() {
-            if IFACE_IGNORE_VEC.iter().any(|sk| name.contains(*sk)) {
+            // spec iface
+            if skip_iface(name, &args_1) {
                 continue;
             }
             net_rx += data.received();
@@ -83,6 +85,7 @@ pub fn start_net_speed_collect_t() {
     });
 }
 
+// TODO
 pub fn sample(args: &Args, stat: &mut StatRequest) {
     stat.version = env!("CARGO_PKG_VERSION").to_string();
     stat.vnstat = args.vnstat;
@@ -143,7 +146,7 @@ pub fn sample(args: &Args, stat: &mut StatRequest) {
 
     // traffic
     if args.vnstat {
-        let (network_in, network_out, m_network_in, m_network_out) = get_vnstat_traffic();
+        let (network_in, network_out, m_network_in, m_network_out) = get_vnstat_traffic(args);
         stat.network_in = network_in;
         stat.network_out = network_out;
         stat.last_network_in = network_in - m_network_in;
@@ -152,7 +155,8 @@ pub fn sample(args: &Args, stat: &mut StatRequest) {
         sys.refresh_networks();
         let (mut network_in, mut network_out) = (0_u64, 0_u64);
         for (name, data) in sys.networks() {
-            if IFACE_IGNORE_VEC.iter().any(|sk| name.contains(*sk)) {
+            // spec iface
+            if skip_iface(name, args) {
                 continue;
             }
             network_in += data.total_received();
@@ -202,12 +206,32 @@ pub fn collect_sys_info(args: &Args) -> SysInfo {
     info_pb.kernel_version = sys.kernel_version().unwrap_or_default();
 
     // cpu
-    let global_processor = sys.global_processor_info();
-    info_pb.cpu_num = sys.processors().len() as u32;
-    info_pb.cpu_brand = global_processor.brand().to_string();
-    info_pb.cpu_vender_id = global_processor.vendor_id().to_string();
+    let global_cpu = sys.global_cpu_info();
+    info_pb.cpu_num = sys.cpus().len() as u32;
+    info_pb.cpu_brand = global_cpu.brand().to_string();
+    info_pb.cpu_vender_id = global_cpu.vendor_id().to_string();
 
     info_pb.host_name = sys.host_name().unwrap_or_default();
 
     info_pb
+}
+
+pub fn gen_sys_id(sys_info: &SysInfo) -> String {
+    let mut sys = System::new_all();
+    let bt = sys.boot_time();
+
+    format!(
+        "{:x}",
+        md5::compute(format!(
+            "{}/{}/{}/{}/{}/{}/{}/{}",
+            sys_info.host_name,
+            sys_info.os_name,
+            sys_info.os_arch,
+            sys_info.os_family,
+            sys_info.os_release,
+            sys_info.kernel_version,
+            sys_info.cpu_brand,
+            bt,
+        ))
+    )
 }

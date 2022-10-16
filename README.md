@@ -2,20 +2,25 @@
 
 [![Docker](https://github.com/zdz/ServerStatus-Rust/actions/workflows/docker.yml/badge.svg)](https://github.com/zdz/ServerStatus-Rust/actions/workflows/docker.yml)
 [![Release](https://github.com/zdz/ServerStatus-Rust/actions/workflows/release.yml/badge.svg)](https://github.com/zdz/ServerStatus-Rust/actions/workflows/release.yml)
+[![GitHub issues](https://img.shields.io/github/issues/zdz/ServerStatus-Rust)](https://github.com/zdz/ServerStatus-Rust/issues)
+[![GitHub Discussions](https://img.shields.io/github/discussions/zdz/ServerStatus-Rust)](https://github.com/zdz/ServerStatus-Rust/discussions)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/zdz/ServerStatus-Rust)](https://github.com/zdz/ServerStatus-Rust/releases)
 [![GitHub all releases](https://img.shields.io/github/downloads/zdz/ServerStatus-Rust/total)](https://github.com/zdz/ServerStatus-Rust/releases)
 
+
 <img width="1215" alt="image" src="https://user-images.githubusercontent.com/152173/165957689-d35714a9-f7f8-49f7-9573-97d4cf3c2f79.png">
 <img width="1436" alt="image" src="https://user-images.githubusercontent.com/152173/165958225-25fc8fda-5798-42f8-bac5-72d778c0bab5.png">
+
+<h2>Table of Contents</h2>
 
 - [✨ Rust 版 ServerStatus 云探针](#-rust-版-serverstatus-云探针)
   - [1. 介绍](#1-介绍)
     - [🍀 主题](#-主题)
   - [2. 安装部署](#2-安装部署)
     - [2.1 快速体验](#21-快速体验)
-    - [2.2 服务管理脚本部署，感谢 @Colsro 提供](#22-服务管理脚本部署感谢-colsro-提供)
-    - [2.3 Railway 部署](#23-railway-部署)
-    - [2.4 前后端分离部署](#24-前后端分离部署)
+    - [2.2 快速部署](#22-快速部署)
+    - [2.3 服务管理脚本部署，感谢 @Colsro 提供](#23-服务管理脚本部署感谢-colsro-提供)
+    - [2.4 Railway 部署](#24-railway-部署)
   - [3. 服务端说明](#3-服务端说明)
     - [3.1 配置文件 `config.toml`](#31-配置文件-configtoml)
     - [3.2 服务端运行](#32-服务端运行)
@@ -31,22 +36,26 @@
   `cppla/ServerStatus` 的威力加强版，保持轻量和简化部署，增加主要特性如下：
 
 - 使用 `rust` 完全重写 `server`、`client`，单个执行文件部署
-- 支持上下线和简单自定义规则告警 (`telegram`、 `wechat`、 `email`)
-- 支持 `http` 协议上报，可配合 `cf` 等优化上报链路
+- 支持上下线和简单自定义规则告警 (`telegram`、 `wechat`、 `email`、 `webhook`)
+- 支持 `http` 协议上报，可以方便部署到各免费容器服务和配合 `cf` 等优化上报链路
 - 支持 `vnstat` 统计月流量，重启不丢流量数据
 - 支持 `railway` 快速部署
 - 支持 `systemd` 开机自启
 - 其它功能，如 🗺️  见 [wiki](https://github.com/zdz/ServerStatus-Rust/wiki)
 
-演示：[tz-rust.vercel.app](https://tz-rust.vercel.app)
+演示：[ssr.rs](https://ssr.rs)
 |
 下载：[Releases](https://github.com/zdz/ServerStatus-Rust/releases)
 |
+[Changelog](https://github.com/zdz/ServerStatus-Rust/releases)
+|
 反馈：[Discussions](https://github.com/zdz/ServerStatus-Rust/discussions)
+
+📕 完整文档迁移至 [doc.ssr.rs](https://doc.ssr.rs)
 
 ### 🍀 主题
 
-如果你觉得你修改的主题还不错，欢迎分享/PR，前端单独部署方法参见 [#37](https://github.com/zdz/ServerStatus-Rust/discussions/37)
+如果你觉得你创造/修改的主题还不错，欢迎分享/PR，前端单独部署方法参见 [#37](https://github.com/zdz/ServerStatus-Rust/discussions/37)
 
 <details>
   <summary>Hotaru 主题</summary>
@@ -54,6 +63,18 @@
 Hotaru 主题由 [@HinataKato](https://github.com/HinataKato) 修改提供，[主题地址](https://github.com/HinataKato/hotaru_theme_for_RustVersion)
 
 <img width="1202" alt="image" src="https://user-images.githubusercontent.com/152173/167900971-5ef0c23a-af43-4f52-aab5-d58e4a66c8ea.png">
+
+</details>
+
+<details>
+  <summary>ServerStatus-web 主题</summary>
+
+ServerStatus-web 主题由 [@mjjrock](https://github.com/mjjrock) 修改提供，[主题地址](https://github.com/mjjrock/ServerStatus-web)
+
+演示：[Demo](https://ssr-web.vercel.app)
+
+<img width="1425" alt="image" src="https://user-images.githubusercontent.com/102237118/171837653-3a5b2cd6-bf02-4602-a132-2c80a6707f68.png">
+
 
 </details>
 
@@ -70,7 +91,11 @@ bash -ex one-touch.sh
 # 自定义部署可参照 one-touch.sh 脚本
 ```
 
-### 2.2 服务管理脚本部署，感谢 [@Colsro](https://github.com/Colsro) 提供
+### 2.2 快速部署
+
+参见 [快速部署](https://doc.ssr.rs/rapid_deploy)
+
+### 2.3 服务管理脚本部署，感谢 [@Colsro](https://github.com/Colsro) 提供
 <details>
   <summary>管理脚本使用说明</summary>
 
@@ -115,68 +140,13 @@ help:
 </details>
 
 
-### 2.3 Railway 部署
+### 2.4 Railway 部署
 
 懒得配置 `Nginx`，`SSL` 证书？试试
-[在 Railway 部署 Server 教程](https://github.com/zdz/ServerStatus-Rust/wiki/Railway)
+[在 Railway 部署 Server](https://github.com/zdz/ServerStatus-Rust/wiki/Railway)
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template/kzT46l?referralCode=pJYbdU)
 
-### 2.4 前后端分离部署
-
-<details>
-  <summary>前后端分离部署</summary>
-
-这种方式是将前端主题部分单独部署在 `vercel.app` ，前后端分离部署，使用 `routes` 指向后端，功能类似 `nginx` 反代，好处是主题保持在自己的库中，主题随便修改而无需改动 `server`。目前 `tz-rust.vercel.app` 也是使用这种方式。[#37](https://github.com/zdz/ServerStatus-Rust/discussions/37)
-
-```bash
-# 1. 参照前面先把 Server 部署好
-# 2. 复制 web 目录，新建一个代码库，工程目录结构如下
-
-~$ tree .
-.
-├── README.md
-├── css
-│   ├── bootstrap-theme.min.css
-│   ├── bootstrap-theme.min.css.map
-│   ├── bootstrap.min.css
-│   ├── bootstrap.min.css.map
-│   └── dark.css
-├── favicon.ico
-├── img
-│   └── dark.png
-├── index.html
-├── js
-│   ├── bootstrap.min.js
-│   ├── jquery.min.js
-│   └── serverstatus.js
-├── netlify.toml
-└── vercel.json
-
-# 3. 在工程目录添加 vercel.json 文件来指定路由，指向你的 Server，内容如下
-
-{
-  "routes": [
-    {
-      "src": "/json/stats.json",
-      "dest": "http://tz.xxx.com:8080/json/stats.json"
-    },
-    {
-      "src": "/detail",
-      "dest": "http://tz.xxx.com:8080/detail"
-    },
-    {
-      "src": "/map",
-      "dest": "http://tz.xxx.com:8080/map"
-    }
-  ]
-}
-
-# 4. 最后将这个静态站点部署到 vercel.com
-# 部署教程参照 =》 google 搜索 "vercel.com 部署静态站点"
-```
-
-</details>
 
 ## 3. 服务端说明
 
@@ -195,14 +165,25 @@ admin_pass = ""
 # name 主机唯一标识，不可重复，alias 为展示名
 # 使用 ansible 批量部署时可以用主机 hostname 作为 name，统一密码
 # notify = false 单独禁止单台机器的告警，一般针对网络差，频繁上下线
-# monthstart = 1 没启用 vnstat 时，表示月流量从每月哪天开始统计
+# monthstart = 1 没启用vnstat时，表示月流量从每月哪天开始统计
 # disabled = true 单机禁用，跟删除这条配置的效果一样
 hosts = [
-  {name = "h1", password = "p1", alias = "n1", location = "🏠", type = "kvm"},
-  {name = "h2", password = "p2", alias = "n2", location = "🏢", type = "kvm", notify = true},
-  {name = "h3", password = "p3", alias = "n3", location = "🏝️", type = "kvm", monthstart = 1},
-  {name = "h4", password = "p4", alias = "n4", location = "🏢", type = "kvm", disabled = false},
+  {name = "h1", password = "p1", alias = "n1", location = "🏠", type = "kvm", notify = true},
+  {name = "h2", password = "p2", alias = "n2", location = "🏢", type = "kvm", disabled = false},
+  {name = "h3", password = "p3", alias = "n3", location = "🏡", type = "kvm", monthstart = 1},
 ]
+
+# 动态注册模式，不再需要针对每一个主机做单独配置
+# gid 为模板组id, 动态注册唯一标识，不可重复
+hosts_group = [
+  # 可以按国家地区或用途来做分组
+  {gid = "g1", password = "pp", location = "🏠", type = "kvm", notify = true},
+  {gid = "g2", password = "pp", location = "🏢", type = "kvm", notify = true},
+  # 例如不发送通知可以单独做一组
+  {gid = "silent", password = "pp", location = "🏡", type = "kvm", notify = false},
+]
+# 动态注册模式下，无效数据清理间隔，默认 30s
+group_gc = 30
 
 # 不开启告警，可忽略后面配置，或者删除不需要的通知方式
 # 告警间隔默认为30s
@@ -210,14 +191,16 @@ notify_interval = 30
 # https://core.telegram.org/bots/api
 # https://jinja.palletsprojects.com/en/3.0.x/templates/#if
 [tgbot]
+# 开关 true 打开
 enabled = false
 bot_token = "<tg bot token>"
 chat_id = "<chat id>"
 # host 可用字段参见 payload.rs 文件 HostStat 结构, {{host.xxx}} 为占位变量
-# 例如 host.name 可替换为 host.alias，大家根据喜好来编写通知消息
+# 例如 host.name 可替换为 host.alias，大家根据自己的喜好来编写通知消息
+# {{ip_info.query}} 主机 ip,  {{sys_info.host_name}} 主机 hostname
 title = "❗<b>Server Status</b>"
-online_tpl  = "{{config.title}} \n😆 {{host.location}} 的 {{host.name}} 主机恢复上线啦"
-offline_tpl = "{{config.title}} \n😱 {{host.location}} 的 {{host.name}} 主机已经掉线啦"
+online_tpl =  "{{config.title}} \n😆 {{host.location}} {{host.name}} 主机恢复上线啦"
+offline_tpl = "{{config.title}} \n😱 {{host.location}} {{host.name}} 主机已经掉线啦"
 # custom 模板置空则停用自定义告警，只保留上下线通知
 custom_tpl = """
 {% if host.memory_used / host.memory_total > 0.5  %}
@@ -253,7 +236,6 @@ RUST_BACKTRACE=1 RUST_LOG=trace ./stat_server -c config.toml
 wget --no-check-certificate -qO docker-compose.yml 'https://raw.githubusercontent.com/zdz/ServerStatus-Rust/master/docker-compose.yml'
 wget --no-check-certificate -qO config.toml 'https://raw.githubusercontent.com/zdz/ServerStatus-Rust/master/config.toml'
 touch stats.json
-docker network create traefik_gw
 docker-compose up -d
 ```
 
@@ -277,27 +259,39 @@ docker-compose up -d
 # rust client 可用参数
 ./stat_client -h
 OPTIONS:
-    -6, --ipv6             ipv6 only, default:false
-    -a, --addr <ADDR>      [default: http://127.0.0.1:8080/report]
-        --cm <CM_ADDR>     China Mobile probe addr [default: cm.tz.cloudcpp.com:80]
-        --ct <CT_ADDR>     China Telecom probe addr [default: ct.tz.cloudcpp.com:80]
-        --cu <CU_ADDR>     China Unicom probe addr [default: cu.tz.cloudcpp.com:80]
-        --disable-extra    disable extra info report, default:false
-        --disable-ping     disable ping, default:false
-        --disable-tupd     disable t/u/p/d, default:false
-    -h, --help             Print help information
-        --ip-info          show ip info, default:false
-        --json             use json protocol, default:false
-    -n, --vnstat           enable vnstat, default:false
-    -p, --pass <PASS>      password [default: p1]
-    -u, --user <USER>      username [default: h1]
-    -V, --version          Print version information
+    -6, --ipv6                   ipv6 only, default:false
+    -a, --addr <ADDR>            [default: http://127.0.0.1:8080/report]
+        --alias <ALIAS>          alias for host [default: unknown]
+        --cm <CM_ADDR>           China Mobile probe addr [default: cm.tz.cloudcpp.com:80]
+        --ct <CT_ADDR>           China Telecom probe addr [default: ct.tz.cloudcpp.com:80]
+        --cu <CU_ADDR>           China Unicom probe addr [default: cu.tz.cloudcpp.com:80]
+        --disable-extra          disable extra info report, default:false
+        --disable-notify         disable notify, default:false
+        --disable-ping           disable ping, default:false
+        --disable-tupd           disable t/u/p/d, default:false
+    -g, --gid <GID>              group id [default: ]
+    -h, --help                   Print help information
+        --ip-info                show ip info, default:false
+        --json                   use json protocol, default:false
+        --location <LOCATION>    location [default: ]
+    -n, --vnstat                 enable vnstat, default:false
+    -p, --pass <PASS>            password [default: p1]
+    -t, --type <HOST_TYPE>       host type [default: ]
+    -u, --user <USER>            username [default: h1]
+    -V, --version                Print version information
+    -w, --weight <WEIGHT>        weight for rank [default: 0]
 
 # 一些参数说明
 --ip-info       # 显示本机ip信息后立即退出，目前使用 ip-api.com 数据
 --disable-extra # 不上报系统信息和IP信息
 --disable-ping  # 停用三网延时和丢包率探测
 --disable-tupd  # 不上报 tcp/udp/进程数/线程数，减少CPU占用
+-w, --weight    # 排序加分，微调让主机靠前显示，无强迫症可忽略
+-g, --gid       # 动态注册的组id
+--alias         # 动态注册模式下，指定主机的展示名字
+# 总流量，网卡流量/网速统计
+-i, --iface         # 非空时，只统计指定网口
+-e, --exclude-iface # 排除指定网口，默认排除 "lo,docker,vnet,veth,vmbr,kube,br-"
 ```
 
 ### 4.2 跨平台版本 (`Window`, `Linux`, `...`)
@@ -360,10 +354,6 @@ vnstat --version
 # 测试查看月流量 (刚安装可能需等一小段时间来采集数据)
 vnstat -m
 vnstat --json m
-
-# server config.toml 开启 vnstat
-# 从 v1.3.6 不再需要在 server 配置开启，client 自由选择启用与否，client 可部分打开，部分关闭
-vnstat = true
 
 # client 使用 -n 参数开启 vnstat 统计
 ./stat_client -a "grpc://127.0.0.1:9394" -u h1 -p p1 -n
@@ -449,8 +439,8 @@ OPTIONS:
 <details>
   <summary>关于这个轮子</summary>
 
-  之前一直在使用 `Prometheus` + `Grafana` + `Alertmanager` + `node_exporter` 做VPS监控，这也是业界比较成熟的监控方案，用过一段时间后，发现非生产环境的话，很多监控指标都用不上，反而显得有些重。
-  而 `ServerStatus` 很好，足够简单和轻量，一眼可以看尽大好山河，只是 `c++` 版本很久没迭代过，自己的一些需求在原版上不是很好修改，如自带 `tcp` 上报对跨区机器不是很友好，也不方便对上报的链路优化 等等。过年的时候正值疫情闲来无事，学习 `Rust` 正好需要个小项目练手，于是撸了个 `ServerStatus` 来练手，项目后面会继续维护但不会增加复杂的功能，保持小而美，简单部署，配合 [Uptime Kuma](https://github.com/louislam/uptime-kuma) 基本上可以满足个人大部分监控需求。
+  之前一直在使用 `Prometheus` + `Grafana` + `Alertmanager` + `node_exporter` 做VPS监控，这也是业界比较成熟的监控方案，用过一段时间后，发现非生产环境，很多监控指标都用不上，反而显得有些重。
+  而 `ServerStatus` 很好，足够简单和轻量，一眼可以看尽所有小机机，只是 `c++` 版本很久没迭代过，自己的一些需求在原版上不是很好修改，如自带 `tcp` 上报对跨区机器不是很友好，也不方便对上报的链路做优化 等等。过年的时候正值疫情闲来无事，学习 `Rust` 正好需要个小项目练手，于是撸了个 `ServerStatus` 来练手，项目后面会佛系更新但不会增加复杂的功能(有意思的除外)，保持小而美，简单部署，配合 [Uptime Kuma](https://github.com/louislam/uptime-kuma) 基本上可以满足个人大部分监控需求。
 
 </details>
 
